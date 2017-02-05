@@ -1,0 +1,28 @@
+---
+- name: clear ca certificate
+  file:
+    path: "{{easy_rsa_ca_path}}"
+    state: absent
+  when: clear_all or clear_ca or adjusted_ca_vars
+
+- name: check ca existence
+  stat:
+    path: "{{easy_rsa_ca_path}}"
+  register: cacert
+
+- name: build ca
+  raw: build-ca
+  when: cacert.stat.exists is defined and not cacert.stat.exists
+  register: cacert_built
+
+- name: copy created ca cert
+  copy:
+    remote_src: True
+    src: "{{easy_rsa_ca_path}}"
+    dest: "{{ca_cert_path}}"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - uci commit openvpn
+    - restart openvpn

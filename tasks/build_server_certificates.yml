@@ -1,0 +1,86 @@
+---
+- name: clear easy-rsa index
+  file:
+    path: "{{easy_rsa_index_path}}"
+    state: absent
+  when: (cacert_built is defined and cacert_built.changed) or clear_all or clear_ca or clear_server_cert
+
+- name: check easy-rsa index existence
+  stat:
+    path: "{{easy_rsa_index_path}}"
+  register: easy_rsa_index
+
+- name: touch index file
+  file:
+    path: "{{easy_rsa_index_path}}"
+    state: touch
+  when: easy_rsa_index.stat.exists is defined and not easy_rsa_index.stat.exists
+
+- name: clear easy-rsa serial
+  file:
+    path: "{{easy_rsa_serial_path}}"
+    state: absent
+  when: (cacert_built is defined and cacert_built.changed) or clear_all or clear_ca or clear_server_cert
+
+- name: check easy-rsa serial existence
+  stat:
+    path: "{{easy_rsa_serial_path}}"
+  register: easy_rsa_serial
+
+- name: touch serial file
+  lineinfile:
+    dest: "{{easy_rsa_serial_path}}"
+    line: '00'
+    create: yes
+  when: easy_rsa_serial.stat.exists is defined and not easy_rsa_serial.stat.exists
+
+- name: clear server certificate request
+  file:
+    path: "{{easy_rsa_server_cert_request_path}}"
+    state: absent
+  when: (cacert_built is defined and cacert_built.changed) or clear_all or clear_ca or clear_server_cert
+
+- name: clear server certificate
+  file:
+    path: "{{easy_rsa_server_cert_path}}"
+    state: absent
+  when: (cacert_built is defined and cacert_built.changed) or clear_all or clear_ca or clear_server_cert
+
+- name: clear server key
+  file:
+    path: "{{easy_rsa_server_key_path}}"
+    state: absent
+  when: (cacert_built is defined and cacert_built.changed) or clear_all or clear_ca or clear_server_cert
+
+- name: check server certificate existence
+  stat:
+    path: "{{easy_rsa_server_cert_path}}"
+  register: server_certificate
+
+- name: build server certificate
+  raw: build-key-server {{config_name}}
+  when: server_certificate.stat.exists is defined and not server_certificate.stat.exists
+
+- name: copy created server cert
+  copy:
+    remote_src: True
+    src: "{{easy_rsa_server_cert_path}}"
+    dest: "{{server_cert_path}}"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - uci commit openvpn
+    - restart openvpn
+
+- name: copy created server key
+  copy:
+    remote_src: True
+    src: "{{easy_rsa_server_key_path}}"
+    dest: "{{server_key_path}}"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - uci commit openvpn
+    - restart openvpn

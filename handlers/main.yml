@@ -1,0 +1,9 @@
+---
+- name: uci commit openvpn
+  uci: command=commit config=openvpn
+
+- name: reload openvpn
+  raw: /etc/init.d/openvpn reload
+
+- name: restart openvpn
+  raw: /etc/init.d/openvpn restart

@@ -1,0 +1,122 @@
+---
+    # Certificate Authority #
+#------------------------------------------------
+ca_key_size: 2048
+ca_expiry: 3650
+ca_country: US
+ca_province: CA
+ca_locality: SanFrancisco
+ca_org: Fort-Funston
+ca_email: me@myhost.mydomain
+ca_org_unit: MyOrganizationalUnit
+ca_common_name: MyCommonName
+
+key_expiry: 3650
+
+    # Server #
+#------------------------------------------------
+server_address: vpn.mydomain.org
+config_name: "my_openvpn_server"
+enabled: False
+
+    # Clients #
+#------------------------------------------------
+clients: []
+download_dir: ./ovpn
+
+    # Protocol #
+#------------------------------------------------
+dev: tun
+topology: subnet
+proto: udp
+port: 1194
+
+    # Routes #
+#------------------------------------------------
+server_ip: '10.0.100.1'
+subnet: '10.0.100.0'
+subnet_mask: '255.255.255.0'
+ifconfig: '{{server_ip}} {{subnet_mask}}'
+
+    # Client Config #
+#------------------------------------------------
+ccd_exclusive: 1
+ifconfig_pool_persist: '/tmp/openvpn.ipconfig_pool.txt'
+
+    # Encryption #
+#------------------------------------------------
+    # Diffie-Hellman:
+dh_path: '/etc/openvpn/dh{{ca_key_size}}.pem'
+
+    # PKCS12:
+pkcs12: '/etc/ssl/openvpn/vpn-server.p12'
+
+    # SSL:
+cipher: 'AES-256-CBC'
+auth: 'SHA512'
+tls_auth_path: '/etc/openvpn/tlsauth.key'
+tls_auth: '{{tls_auth_path}} 0'
+
+    # TLS:
+tls_server: 1
+tls_version_min: '1.0'
+#tls_version_min: 1.2
+tls_cipher: 'TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA256:TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-128-CBC-SHA256:TLS-DHE-RSA-WITH-AES-256-CBC-SHA'
+#tls_cipher: 'TLS-ECDHE-RSA-WITH-AES-256-CBC-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA256:TLS-ECDH-RSA-WITH-AES-256-CBC-SHA384:TLS-RSA-WITH-AES-256-CBC-SHA256:!aNULL:!eNULL:!LOW:!3DES:!MD5:!SHA:!EXP:!PSK:!SRP:!DSS:!RC4'
+
+    # Logging #
+#------------------------------------------------
+log_append: '/tmp/openvpn.log'
+status: '/tmp/openvpn-status.log'
+verb: 4
+
+    # Connection Options #
+#------------------------------------------------
+keepalive: '10 60'
+comp_lzo: 'yes'
+
+    # Connection Reliability #
+#------------------------------------------------
+client_to_client: 1
+persist_key: 1
+persist_tun: 1
+
+    # Connection Speed #
+#------------------------------------------------
+sndbuf: 393216
+rcvbuf: 393216
+fragment: 0
+mssfix: 1420
+tun_mtu: 48000
+
+    # Permissions #
+#------------------------------------------------
+user: 'nobody'
+group: 'nogroup'
+
+    # Paths #
+#------------------------------------------------
+easy_rsa_path: /etc/easy-rsa
+easy_rsa_certs_path: "{{easy_rsa_path}}/keys"
+easy_rsa_ca_path: "{{easy_rsa_certs_path}}/ca.crt"
+easy_rsa_server_cert_path: "{{easy_rsa_certs_path}}/{{config_name}}.crt"
+easy_rsa_server_key_path: "{{easy_rsa_certs_path}}/{{config_name}}.key"
+easy_rsa_server_cert_request_path: "{{easy_rsa_certs_path}}/{{config_name}}.csr"
+easy_rsa_dh_param_path: "{{easy_rsa_certs_path}}/dh2048.pem"
+easy_rsa_index_path: "{{easy_rsa_certs_path}}/index.txt"
+easy_rsa_serial_path: "{{easy_rsa_certs_path}}/serial"
+easy_rsa_client_certs_path: "{{easy_rsa_certs_path}}"
+easy_rsa_vars_path: "{{easy_rsa_path}}/vars"
+
+ca_cert_path: /etc/openvpn/ca.crt
+server_cert_path: /etc/openvpn/{{config_name}}.crt
+server_key_path: /etc/openvpn/{{config_name}}.key
+
+    # Clean up and rebuild #
+#------------------------------------------------
+clear_all: False
+clear_ca: False
+clear_server_cert: False
+clear_dh_param: False
+clear_tlsauth: False
+clear_client_certs: False

@@ -1,0 +1,54 @@
+---
+- set_fact:
+    client_cert_path: "{{easy_rsa_client_certs_path}}/{{client}}.crt"
+    client_key_path: "{{easy_rsa_client_certs_path}}/{{client}}.key"
+    client_cert_request_path: "{{easy_rsa_client_certs_path}}/{{client}}.csr"
+    client_ovpn_path: "{{easy_rsa_client_certs_path}}/{{client}}.ovpn"
+
+- name: clear client certificate request
+  file:
+    path: "{{client_cert_request_path}}"
+    state: absent
+  when: (cacert_built is defined and cacert_built.changed) or clear_all or clear_ca or clear_server_cert or clear_client_certs
+
+- name: clear client certificate
+  file:
+    path: "{{client_cert_path}}"
+    state: absent
+  when: clear_all or clear_ca or clear_server_cert or clear_client_certs
+
+- name: clear client key
+  file:
+    path: "{{client_key_path}}"
+    state: absent
+  when: clear_all or clear_ca or clear_server_cert or clear_client_certs
+
+- name: check client certificate existence
+  stat:
+    path: "{{client_cert_path}}"
+  register: client_certificate
+
+- name: build client certificate
+  raw: export KEY_CN="{{client}}" && build-key {{client}}
+  when: client_certificate.stat.exists is defined and not client_certificate.stat.exists
+
+- name: read client key
+  slurp:
+    src: "{{client_key_path}}"
+  register: client_key
+
+- name: read client certificate
+  slurp:
+    src: "{{client_cert_path}}"
+  register: client_cert
+
+- name: build client.ovpn file
+  template:
+    src: client.ovpn.j2
+    dest: "{{client_ovpn_path}}"
+
+- name: download client ovpn
+  fetch:
+    src: "{{client_ovpn_path}}"
+    dest: "{{download_dir}}/{{client}}.ovpn"
+    flat: yes

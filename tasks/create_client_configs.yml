@@ -1,0 +1,21 @@
+---
+- name: ensure clients path existence
+  file:
+    path: "{{easy_rsa_client_certs_path}}"
+    state: directory
+
+- name: read ca certificate
+  slurp:
+    src: "{{ca_cert_path}}"
+  register: ca_cert
+
+- name: read tlsauth
+  slurp:
+    src: "{{tls_auth_path}}"
+  register: tls_auth
+
+- name: create and download client configs
+  include: create_client_config.yml
+  vars:
+    client: "{{item}}"
+  with_items: "{{clients}}"

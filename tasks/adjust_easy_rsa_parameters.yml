@@ -1,0 +1,66 @@
+---
+- name: adjust key size
+  lineinfile:
+    line: 'export KEY_SIZE={{ca_key_size}}'
+    regexp: '^export KEY_SIZE=[0-9]+$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_key_size
+
+- name: adjust ca expiry
+  lineinfile:
+    line: 'export CA_EXPIRE={{ca_expiry}}'
+    regexp: '^export CA_EXPIRE=[0-9]+$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_ca_expiry
+
+- name: adjust certificate key expiry
+  lineinfile:
+    line: 'export KEY_EXPIRE={{key_expiry}}'
+    regexp: '^export KEY_EXPIRE=[0-9]+$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_cert_key_expiry
+
+- name: adjust ca country
+  lineinfile:
+    line: 'export KEY_COUNTRY="{{ca_country}}"'
+    regexp: '^export KEY_COUNTRY=".*"$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_ca_country
+
+- name: adjust ca province
+  lineinfile:
+    line: 'export KEY_PROVINCE="{{ca_province}}"'
+    regexp: '^export KEY_PROVINCE=".*"$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_ca_province
+
+- name: adjust ca city
+  lineinfile:
+    line: 'export KEY_CITY="{{ca_locality}}"'
+    regexp: '^export KEY_CITY=".*"$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_ca_city
+
+- name: adjust ca organization
+  lineinfile:
+    line: 'export KEY_ORG="{{ca_org}}"'
+    regexp: '^export KEY_ORG=".*"$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_ca_org
+
+- name: adjust ca email
+  lineinfile:
+    line: 'export KEY_EMAIL="{{ca_email}}"'
+    regexp: '^export KEY_EMAIL=".*"$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_ca_email
+
+- name: adjust ca organization unit
+  lineinfile:
+    line: 'export KEY_OU="{{ca_org_unit}}"'
+    regexp: '^export KEY_OU=".*"$'
+    dest: '{{easy_rsa_vars_path}}'
+  register: adjusted_ca_org_unit
+
+- set_fact:
+    adjusted_ca_vars: "{{adjusted_key_size.changed or adjusted_ca_expiry.changed or adjusted_cert_key_expiry.changed or adjusted_ca_country.changed or adjusted_ca_province.changed or adjusted_ca_city.changed or adjusted_ca_org.changed or adjusted_ca_email.changed or adjusted_ca_org_unit.changed}}"

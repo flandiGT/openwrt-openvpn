@@ -1,0 +1,24 @@
+---
+- name: install openvpn-openssl package
+  opkg: name=openvpn-openssl state=present update_cache=yes
+  register: openvpn_install
+
+# need to reinstall this packages, because:
+# python installs zlib and libopennsl into ram (because of playbook wants so)
+# but the packages will be missed after restart
+- name: reinstall dependencies into root
+  raw: opkg remove {{item}} --force-depends && opkg install {{item}}
+  when: openvpn_install.changed
+  with_items:
+    - zlib
+    - openssl-util
+    - libopenssl
+
+- name: install easy-rsa package
+  opkg: name=openvpn-easy-rsa state=present
+
+- name: link openssl config file
+  file:
+    src: /etc/easy-rsa/openssl-1.0.0.cnf
+    dest: /etc/easy-rsa/openssl.cnf
+    state: link

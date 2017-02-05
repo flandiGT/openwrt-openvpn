@@ -1,0 +1,12 @@
+---
+- name: "set openvpn server {{item.key}}"
+  uci:
+    command: set_list
+    config: openvpn
+    section: "{{name}}"
+    type: openvpn
+    option: "{{item.key}}"
+    value: "{{item.value}}"
+  notify:
+    - uci commit openvpn
+    - reload openvpn

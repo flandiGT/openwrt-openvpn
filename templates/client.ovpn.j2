@@ -1,0 +1,60 @@
+    # Config Type #
+#------------------------------------------------
+client
+
+    # Connection  #
+#------------------------------------------------
+dev tun
+proto udp
+remote {{server_address}} {{port}}
+
+    # Speed #
+#------------------------------------------------
+mssfix 0
+fragment 0
+tun-mtu 48000
+
+    # Reliability #
+#------------------------------------------------
+float
+nobind
+comp-lzo
+
+persist-key
+persist-tun
+resolv-retry infinite
+
+    # Encryption #
+#------------------------------------------------
+auth SHA512
+auth-nocache
+
+# --- SSL --- #
+cipher AES-256-CBC
+
+# --- TLS --- #
+tls-client
+key-direction 1
+tls-version-min {{tls_version_min}}
+#remote-cert-eku 'TLS Web Server Authentication'
+remote-cert-tls server
+
+<tls-auth>
+{{ tls_auth.content | b64decode }}
+</tls-auth>
+
+    # Logging #
+#------------------------------------------------
+verb 5
+
+    # Keys and Certificates #
+#------------------------------------------------
+<key>
+{{ client_key.content | b64decode }}
+</key>
+<cert>
+{{ client_cert.content | b64decode }}
+</cert>
+<ca>
+{{ ca_cert.content | b64decode }}
+</ca>

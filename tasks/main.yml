@@ -1,0 +1,78 @@
+---
+- name: install needed packages
+  include: install_needed_packages.yml
+
+- name: build in non-interactive mode
+  include: build_in_non_interactive_mode.yml
+
+- name: adjust easy-rsa parameters
+  include: adjust_easy_rsa_parameters.yml
+
+- name: build ca
+  include: build_ca.yml
+
+- name: build server certificates
+  include: build_server_certificates.yml
+
+- name: build tls auth key
+  include: build_tls_auth.yml
+
+- name: build dh param
+  include: build_dh_param.yml
+
+- name: create and download client configs
+  include: create_client_configs.yml
+
+- name: set openvpn values
+  include: set_openvpn_uci_values.yml
+  vars:
+    name: '{{config_name}}'
+  with_dict:
+    enabled: '{{enabled | int}}'
+    port: '{{port}}'
+    proto: '{{proto}}'
+    dev: '{{dev}}'
+    ca: '{{ca_cert_path}}'
+    cert: '{{server_cert_path}}'
+    key: '{{server_key_path}}'
+    dh: '{{dh_path}}'
+    server: '{{subnet}} {{subnet_mask}}'
+    ifconfig_pool_persist: '{{ifconfig_pool_persist}}'
+    keepalive: '{{keepalive}}'
+    comp_lzo: '{{comp_lzo}}'
+    persist_key: '{{persist_key}}'
+    persist_tun: '{{persist_tun}}'
+    user: '{{user}}'
+    status: '{{status}}'
+    log: '{{log_append}}'
+    verb: '{{verb}}'
+    cipher: '{{cipher}}'
+    auth: '{{auth}}'
+    tls_auth: '{{tls_auth_path}} 0'
+    tls_server: '{{tls_server}}'
+    tls_version_min: '{{tls_version_min}}'
+    tls_cipher: '{{tls_cipher}}'
+    mssfix: '{{mssfix}}'
+    max_clients: 2
+  notify:
+    - uci commit openvpn
+    - reload openvpn
+
+- set_fact:
+    push_values:
+      - 'redirect-gateway def1'
+      - 'route {{server_ip}} {{subnet_mask}}'
+      - 'dhcp-option    DNS {{server_ip}}'
+      - 'dhcp-option    WINS {{server_ip}}'
+      - 'sndbuf {{sndbuf}}'
+      - 'rcvbuf {{rcvbuf}}'
+
+- name: set openvpn list values
+  include: set_openvpn_uci_list_values.yml
+  vars:
+    name: "{{config_name}}"
+  with_dict:
+    push: "{{push_values}}"
+  notify:
+    - uci commit openvpn
+    - reload openvpn

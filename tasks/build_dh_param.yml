@@ -1,0 +1,27 @@
+---
+- name: clear Diffie-Hellman parameter
+  file:
+    path: "{{easy_rsa_dh_param_path}}"
+    state: absent
+  when: clear_all or clear_dh_param
+
+- name: check Diffie-Hellman parameter existence
+  stat:
+    path: "{{easy_rsa_dh_param_path}}"
+  register: dh_param
+
+- name: build Diffie-Hellman parameter (may take a long time)
+  raw: build-dh
+  when: dh_param.stat.exists is defined and not dh_param.stat.exists
+
+- name: copy Diffie-Hellman parameter
+  copy:
+    remote_src: True
+    src: "{{easy_rsa_dh_param_path}}"
+    dest: "{{dh_path}}"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - uci commit openvpn
+    - restart openvpn

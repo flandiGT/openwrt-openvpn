@@ -9,19 +9,19 @@
   file:
     path: "{{client_cert_request_path}}"
     state: absent
-  when: (cacert_built is defined and cacert_built.changed) or clear_all or clear_ca or clear_server_cert or clear_client_certs
+  when: (cacert_built is defined and cacert_built.changed) or clear_client_certs
 
 - name: clear client certificate
   file:
     path: "{{client_cert_path}}"
     state: absent
-  when: clear_all or clear_ca or clear_server_cert or clear_client_certs
+  when: (cacert_built is defined and cacert_built.changed) or clear_client_certs
 
 - name: clear client key
   file:
     path: "{{client_key_path}}"
     state: absent
-  when: clear_all or clear_ca or clear_server_cert or clear_client_certs
+  when: (cacert_built is defined and cacert_built.changed) or clear_client_certs
 
 - name: check client certificate existence
   stat:

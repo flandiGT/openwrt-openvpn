@@ -36,7 +36,9 @@ port: 1194
 server_ip: '10.0.100.1'
 subnet: '10.0.100.0'
 subnet_mask: '255.255.255.0'
-ifconfig: '{{server_ip}} {{subnet_mask}}'
+route_gateway: dhcp
+redirect_gateway: def1
+search_domain: lan
 
     # Client Config #
 #------------------------------------------------

@@ -37,12 +37,16 @@
     key: '{{server_key_path}}'
     dh: '{{dh_path}}'
     server: '{{subnet}} {{subnet_mask}}'
+    ifconfig: '{{server_ip}} {{subnet_mask}}'
     ifconfig_pool_persist: '{{ifconfig_pool_persist}}'
+    topology: '{{topology}}'
+    route_gateway: '{{route_gateway}}'
     keepalive: '{{keepalive}}'
     comp_lzo: '{{comp_lzo}}'
     persist_key: '{{persist_key}}'
     persist_tun: '{{persist_tun}}'
     user: '{{user}}'
+    group: '{{group}}'
     status: '{{status}}'
     log: '{{log_append}}'
     verb: '{{verb}}'
@@ -60,10 +64,13 @@
 
 - set_fact:
     push_values:
-      - 'redirect-gateway def1'
-      - 'route {{server_ip}} {{subnet_mask}}'
+      - 'topology {{topology}}'
+      - 'route-gateway {{route_gateway}}'
+      - 'redirect-gateway {{redirect_gateway}}'
+      - 'route {{subnet}} {{subnet_mask}}'
       - 'dhcp-option    DNS {{server_ip}}'
       - 'dhcp-option    WINS {{server_ip}}'
+      - 'dhcp-option    DOMAIN {{search_domain}}'
       - 'sndbuf {{sndbuf}}'
       - 'rcvbuf {{rcvbuf}}'
 

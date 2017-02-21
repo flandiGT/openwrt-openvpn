@@ -24,46 +24,43 @@
   include: create_client_configs.yml
 
 - name: set openvpn values
-  include: set_openvpn_uci_values.yml
-  vars:
-    name: '{{config_name}}'
-  with_dict:
-    enabled: '{{enabled | int}}'
-    port: '{{port}}'
-    proto: '{{proto}}'
-    dev: '{{dev}}'
-    ca: '{{ca_cert_path}}'
-    cert: '{{server_cert_path}}'
-    key: '{{server_key_path}}'
-    dh: '{{dh_path}}'
-    server: '{{subnet}} {{subnet_mask}}'
-    ifconfig: '{{server_ip}} {{subnet_mask}}'
-    ifconfig_pool_persist: '{{ifconfig_pool_persist}}'
-    topology: '{{topology}}'
-    route_gateway: '{{route_gateway}}'
-    keepalive: '{{keepalive}}'
-    comp_lzo: '{{comp_lzo}}'
-    persist_key: '{{persist_key}}'
-    persist_tun: '{{persist_tun}}'
-    user: '{{user}}'
-    group: '{{group}}'
-    status: '{{status}}'
-    log: '{{log_append}}'
-    verb: '{{verb}}'
-    cipher: '{{cipher}}'
-    auth: '{{auth}}'
-    tls_auth: '{{tls_auth_path}} 0'
-    tls_server: '{{tls_server}}'
-    tls_version_min: '{{tls_version_min}}'
-    tls_cipher: '{{tls_cipher}}'
-    mssfix: '{{mssfix}}'
-    max_clients: 2
-  notify:
-    - uci commit openvpn
-    - reload openvpn
-
-- set_fact:
-    push_values:
+  uci:
+    command: set_object
+    config: openvpn
+    type: openvpn
+    section: "{{config_name}}"
+    values:
+      enabled: '{{enabled | int}}'
+      port: '{{port}}'
+      proto: '{{proto}}'
+      dev: '{{dev}}'
+      ca: '{{ca_cert_path}}'
+      cert: '{{server_cert_path}}'
+      key: '{{server_key_path}}'
+      dh: '{{dh_path}}'
+      server: '{{subnet}} {{subnet_mask}}'
+      ifconfig: '{{server_ip}} {{subnet_mask}}'
+      ifconfig_pool_persist: '{{ifconfig_pool_persist}}'
+      topology: '{{topology}}'
+      route_gateway: '{{route_gateway}}'
+      keepalive: '{{keepalive}}'
+      comp_lzo: '{{comp_lzo}}'
+      persist_key: '{{persist_key}}'
+      persist_tun: '{{persist_tun}}'
+      user: '{{user}}'
+      group: '{{group}}'
+      status: '{{status}}'
+      log: '{{log_append}}'
+      verb: '{{verb}}'
+      cipher: '{{cipher}}'
+      auth: '{{auth}}'
+      tls_auth: '{{tls_auth_path}} 0'
+      tls_server: '{{tls_server}}'
+      tls_version_min: '{{tls_version_min}}'
+      tls_cipher: '{{tls_cipher}}'
+      mssfix: '{{mssfix}}'
+      max_clients: 2
+      push:
       - 'topology {{topology}}'
       - 'route-gateway {{route_gateway}}'
       - 'redirect-gateway {{redirect_gateway}}'
@@ -73,13 +70,6 @@
       - 'dhcp-option    DOMAIN {{search_domain}}'
       - 'sndbuf {{sndbuf}}'
       - 'rcvbuf {{rcvbuf}}'
-
-- name: set openvpn list values
-  include: set_openvpn_uci_list_values.yml
-  vars:
-    name: "{{config_name}}"
-  with_dict:
-    push: "{{push_values}}"
   notify:
     - uci commit openvpn
     - reload openvpn

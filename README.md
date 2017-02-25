@@ -4,6 +4,22 @@ openwrt-openvpn
 configure openvpn aspects of your openwrt system.
 compare: [https://wiki.openwrt.org/inbox/vpn.howto]
 
+Dependencies
+------------
+
+* [openwrt-uci](https://github.com/flandiGT/openwrt-uci)
+* python installed (in ram at least)
+
+What's happening?
+-----------------
+
+* Generate CA certificate (if not present)
+* Generate Server certificate (if not present)
+* Generate TLS Authentication key (if not present)
+* Generate Diffie-Hellman parameter (if not present, may take a long time)
+* Generate (and download) client certificates and configs
+* Setup OpenVPN server
+
 Role Variables
 --------------
 
@@ -37,12 +53,6 @@ Role Variables
 | clear_tlsauth     | boolean            | true = will clear tlsauth key and rebuild it                                                                                            | False |
 | clear_client_certs | boolean           | true = will clear client certificates and keys                                                                                          | False |
 
-Dependencies
-------------
-
-* openwrt-uci
-* python installed (in ram at least)
-
 Example Playbook
 ----------------
 
@@ -58,5 +68,6 @@ Example Playbook
         - vpnclient02
 ```
 
-[https://wiki.openwrt.org/inbox/vpn.howto]: https://wiki.openwrt.org/inbox/vpn.howto
-[https://wiki.openwrt.org/doc/howto/openvpn-streamlined-server-setup]: https://wiki.openwrt.org/doc/howto/openvpn-streamlined-server-setup
+Official documentation:
+* [OpenWRT Wiki / OpenVPN server](https://wiki.openwrt.org/inbox/vpn.howto)
+* [OpenWRT Wiki / OpenVPN Server HowTo (Streamlined)](https://wiki.openwrt.org/doc/howto/openvpn-streamlined-server-setup)
